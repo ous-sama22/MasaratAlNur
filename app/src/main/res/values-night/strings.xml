@@ -1,7 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MasaratAlNur</string>
-
-    <string name="error_field_required">هذا الحقل مطلوب</string> <!-- This field is required -->
 
     <!-- Login Screen -->
     <string name="login_title">تسجيل الدخول</string> <!-- Login -->
@@ -15,15 +14,7 @@
     <string name="error_login_failed">فشل تسجيل الدخول: %s</string> <!-- Login failed: %s -->
     <string name="login_loading">جارِ تسجيل الدخول…</string> <!-- Logging in... -->
 
-
-    <!-- Sign Up Screen -->
+    <!-- Placeholder for Sign Up strings (we'll add more later) -->
     <string name="signup_title">إنشاء حساب جديد</string> <!-- Create New Account -->
-    <string name="hint_confirm_password">تأكيد كلمة المرور</string> <!-- Confirm Password -->
-    <string name="button_signup">إنشاء حساب</string> <!-- Sign Up -->
-    <string name="prompt_have_account">لديك حساب بالفعل؟ <font color="#007bff"><b>سجل الدخول</b></font></string> <!-- Already have an account? Log in -->
-    <string name="error_password_mismatch">كلمتا المرور غير متطابقتين</string> <!-- Passwords do not match -->
-    <string name="error_signup_failed">فشل إنشاء الحساب: %s</string> <!-- Sign up failed: %s -->
-    <string name="signup_loading">جارِ إنشاء الحساب…</string> <!-- Creating account... -->
-    <string name="signup_success">تم إنشاء الحساب بنجاح!</string> <!-- Account created successfully! -->
 
 </resources>

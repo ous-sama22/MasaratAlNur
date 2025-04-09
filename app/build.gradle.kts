@@ -62,6 +62,7 @@ dependencies {
 
     // --- Firebase UI ---
     implementation(libs.firebase.ui.auth)
+    implementation(libs.androidx.navigation.fragment)
     // implementation(libs.google.auth)
 
     testImplementation(libs.junit)
