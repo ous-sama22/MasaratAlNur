@@ -85,6 +85,10 @@ class LoginFragment : Fragment() {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
+        binding.textForgotPassword.setOnClickListener {
+            handleForgotPassword()
+        }
+
         binding.textGoToSignup.setOnClickListener {
             // Navigate to SignUpFragment using Navigation Component Action
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
@@ -176,6 +180,34 @@ class LoginFragment : Fragment() {
                     // If sign in fails, display a message to the user.
                     Log.w("LoginFragment", "Firebase signInWithCredential (Google):failure", task.exception)
                     Toast.makeText(context, "Firebase Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    // Add this function to LoginFragment.kt
+    private fun handleForgotPassword() {
+        val email = binding.inputEditEmail.text.toString().trim()
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            // Optionally show a dialog asking for email instead of using the login field's content
+            Toast.makeText(context, getString(R.string.forgot_password_enter_email), Toast.LENGTH_SHORT).show()
+            binding.inputLayoutEmail.error = getString(R.string.forgot_password_enter_email) // Highlight the email field
+            return
+        }
+        binding.inputLayoutEmail.error = null // Clear error if email is valid now
+
+        showLoading(true) // Show loading briefly
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                showLoading(false) // Hide loading
+                if (task.isSuccessful) {
+                    Log.d("LoginFragment", "Password reset email sent to $email")
+                    Toast.makeText(context, getString(R.string.forgot_password_email_sent), Toast.LENGTH_LONG).show()
+                } else {
+                    Log.w("LoginFragment", "sendPasswordResetEmail:failure", task.exception)
+                    val errorMessage = task.exception?.message ?: getString(R.string.error_unknown)
+                    Toast.makeText(context, getString(R.string.forgot_password_error, errorMessage), Toast.LENGTH_LONG).show()
                 }
             }
     }

@@ -29,7 +29,13 @@
     <string name="signup_loading">جارِ إنشاء الحساب…</string> <!-- Creating account... -->
     <string name="signup_success">تم إنشاء الحساب بنجاح!</string> <!-- Account created successfully! -->
 
+    <!-- Forgot Password -->
+    <string name="forgot_password_prompt">هل نسيت كلمة المرور؟</string> <!-- Forgot Password? -->
+    <string name="forgot_password_email_sent">تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.</string> <!-- Password reset link sent to your email. -->
+    <string name="forgot_password_enter_email">الرجاء إدخال بريدك الإلكتروني أولاً.</string> <!-- Please enter your email first. -->
+    <string name="forgot_password_error">فشل إرسال رابط إعادة التعيين: %s</string> <!-- Failed to send reset link: %s -->
 
+    <!-- firebase -->
     <string name="default_web_client_id" translatable="false">116782521214-6f7053gshamilp2gfprcuutok9qpj5k6.apps.googleusercontent.com</string>
 
 </resources>

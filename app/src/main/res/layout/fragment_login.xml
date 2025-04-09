@@ -71,6 +71,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <TextView
+        android:id="@+id/text_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:text="@string/forgot_password_prompt"
+            android:textColor="?attr/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/input_layout_password"
+        app:layout_constraintEnd_toEndOf="@id/input_layout_password"/>
+
     <!-- Login Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_login"
@@ -81,7 +92,7 @@
         android:text="@string/button_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_layout_password" />
+        app:layout_constraintTop_toBottomOf="@id/text_forgot_password" />
 
     <!-- Google Sign In Button -->
     <!-- Note: The official Google Sign In button has specific branding guidelines -->
