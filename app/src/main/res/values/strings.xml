@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">MasaratAlNur</string>
 
+    <!-- error -->
+    <!-- error general-->
     <string name="error_field_required">هذا الحقل مطلوب</string> <!-- This field is required -->
+    <string name="error_unknown">حدث خطأ غير متوقع.</string> <!-- An unexpected error occurred. -->
 
     <!-- Login Screen -->
     <string name="login_title">تسجيل الدخول</string> <!-- Login -->
@@ -25,5 +28,8 @@
     <string name="error_signup_failed">فشل إنشاء الحساب: %s</string> <!-- Sign up failed: %s -->
     <string name="signup_loading">جارِ إنشاء الحساب…</string> <!-- Creating account... -->
     <string name="signup_success">تم إنشاء الحساب بنجاح!</string> <!-- Account created successfully! -->
+
+
+    <string name="default_web_client_id" translatable="false">116782521214-6f7053gshamilp2gfprcuutok9qpj5k6.apps.googleusercontent.com</string>
 
 </resources>

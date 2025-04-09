@@ -49,14 +49,14 @@ class SignUpFragment : Fragment() {
         val password = binding.inputEditPasswordSignup.text.toString().trim()
         val confirmPassword = binding.inputEditConfirmPassword.text.toString().trim()
 
-        // --- Input Validation ---
-        if (email.isEmpty()) {
-            binding.inputLayoutEmailSignup.error = getString(R.string.error_field_required) // Need this string
+        // --- Input Validation (Keep the existing validation code) ---
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) { // Improved email validation
+            binding.inputLayoutEmailSignup.error = getString(R.string.error_invalid_email)
             return
         } else {
-            binding.inputLayoutEmailSignup.error = null // Clear error
+            binding.inputLayoutEmailSignup.error = null
         }
-
+        // ... other validation for password, confirmPassword, mismatch ...
         if (password.isEmpty()) {
             binding.inputLayoutPasswordSignup.error = getString(R.string.error_field_required)
             return
@@ -82,16 +82,37 @@ class SignUpFragment : Fragment() {
         }
         // --- End Validation ---
 
+        showLoading(true) // Show progress bar
 
-        showLoading(true)
-        binding.root.postDelayed({ showLoading(false) }, 2000) // Simulate network
+        // --- Firebase Sign Up Call ---
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(requireActivity()) { task -> // Use requireActivity() for lifecycle context
+                showLoading(false) // Hide progress bar regardless of outcome
+                if (task.isSuccessful) {
+                    // Sign in success
+                    Log.d("SignUpFragment", "createUserWithEmail:success")
+                    // Optional: Send verification email
+                    // auth.currentUser?.sendEmailVerification()?.addOnCompleteListener { verificationTask -> ... }
 
-        // TODO: Call Firebase createUserWithEmailAndPassword
-        // TODO: Handle success (maybe show message, then navigate to Login or directly to Main?)
-        // TODO: Handle failure (show specific error message from Firebase Exception, hide progress bar)
+                    Toast.makeText(context, getString(R.string.signup_success), Toast.LENGTH_SHORT).show()
 
+                    // Navigate to Login screen after successful signup
+                    // Or potentially directly to MainActivity if desired (but login is common)
+                    findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w("SignUpFragment", "createUserWithEmail:failure", task.exception)
+                    // Try to show a more specific error
+                    val errorMessage = task.exception?.message ?: getString(R.string.error_unknown) // Need error_unknown string
+                    Toast.makeText(context, getString(R.string.error_signup_failed, errorMessage), Toast.LENGTH_LONG).show()
+                    // You might want to parse task.exception to provide more specific feedback
+                    // e.g., FirebaseAuthUserCollisionException means email already exists
+                    // FirebaseAuthWeakPasswordException etc.
+                }
+            }
+        // --- End Firebase Call ---
     }
-
     private fun showLoading(isLoading: Boolean) {
         binding.progressBarSignup.visibility = if (isLoading) View.VISIBLE else View.GONE
         binding.buttonSignup.isEnabled = !isLoading
