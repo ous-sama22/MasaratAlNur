@@ -35,7 +35,26 @@
     <string name="forgot_password_enter_email">الرجاء إدخال بريدك الإلكتروني أولاً.</string> <!-- Please enter your email first. -->
     <string name="forgot_password_error">فشل إرسال رابط إعادة التعيين: %s</string> <!-- Failed to send reset link: %s -->
 
+    <!-- Bottom Navigation Menu -->
+    <string name="menu_home">الرئيسية</string> <!-- Home -->
+    <string name="menu_profile">الملف الشخصي</string> <!-- Profile -->
+
     <!-- firebase -->
     <string name="default_web_client_id" translatable="false">116782521214-6f7053gshamilp2gfprcuutok9qpj5k6.apps.googleusercontent.com</string>
+
+    <string name="button_logout">سجل الخروج</string>
+    <string name="user_not_found">تعذر العثور على بيانات المستخدم</string>
+
+
+    <!-- Profile -->
+    <string name="label_display_name">الاسم:</string> <!-- Name: -->
+    <string name="label_email">البريد الإلكتروني:</string> <!-- Email: -->
+    <string name="label_total_xp">مجموع النقاط:</string> <!-- Total XP: -->
+    <string name="label_current_streak">سلسلة الأيام:</string> <!-- Current Streak: -->
+    <string name="xp_format">%d نقطة</string> <!-- %d XP -->
+    <string name="streak_format">🔥 %d أيام</string> <!-- 🔥 %d Days -->
+    <string name="streak_format_zero">ابدأ التعلم اليوم!</string> <!-- Start learning today! -->
+    <string name="unknown_user">مستخدم غير معروف</string> <!-- Unknown User -->
+    <string name="email_not_available">البريد الإلكتروني غير متوفر</string> <!-- Email not available -->
 
 </resources>

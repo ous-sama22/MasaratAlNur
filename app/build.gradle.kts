@@ -48,10 +48,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-//    implementation(libs.play.services.auth)
-//    constraints {
-//        implementation(libs.play.services.auth)
-//    }
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
 
     // --- Firebase ---
@@ -62,8 +59,10 @@ dependencies {
 
     // --- Firebase UI ---
     implementation(libs.firebase.ui.auth)
+
+    // --- Navigation ---
+    implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.fragment)
-    // implementation(libs.google.auth)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,8 +1,8 @@
-package com.oussama.masaratalnur
+package com.oussama.masaratalnur.ui.auth
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.oussama.masaratalnur.databinding.ActivityAuthBinding // Import ViewBinding class
+import com.oussama.masaratalnur.databinding.ActivityAuthBinding
 
 class AuthActivity : AppCompatActivity() {
 

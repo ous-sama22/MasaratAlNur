@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeFragment"> <!-- Start with Home -->
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.oussama.masaratalnur.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+    tools:layout="@layout/fragment_home" />
+    <!-- No actions needed here for bottom nav switching -->
+    <!-- Actions might be added later for navigating *from* home *to* other screens like LessonList -->
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.oussama.masaratalnur.ui.profile.ProfileFragment"
+        android:label="@string/menu_profile"
+    tools:layout="@layout/fragment_profile" />
+    <!-- No actions needed here for bottom nav switching -->
+
+</navigation>

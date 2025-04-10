@@ -1,16 +1,18 @@
-package com.oussama.masaratalnur
+package com.oussama.masaratalnur.ui.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope // Import lifecycleScope
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth // Import Firebase auth ktx
-import com.google.firebase.ktx.Firebase // Import Firebase ktx
-import kotlinx.coroutines.delay // Import delay
-import kotlinx.coroutines.launch // Import launch
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.oussama.masaratalnur.ui.auth.AuthActivity
+import com.oussama.masaratalnur.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen") // Suppress Lint warning for custom splash screen without recommended API < 31 handling (we'll keep it simple for now)
 class SplashActivity : AppCompatActivity() {
