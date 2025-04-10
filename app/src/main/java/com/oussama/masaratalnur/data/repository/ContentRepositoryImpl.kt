@@ -2,10 +2,13 @@ package com.oussama.masaratalnur.data.repository
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query // Import Query for ordering
+import com.google.firebase.firestore.ListenerRegistration // Import if not already
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObjects // Import toObjects for list deserialization
+// Import toObjects for Category as well
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
+import com.oussama.masaratalnur.data.model.Category // Import Category
 import com.oussama.masaratalnur.data.model.ContentResult
 import com.oussama.masaratalnur.data.model.Topic
 import kotlinx.coroutines.channels.awaitClose
@@ -16,40 +19,74 @@ class ContentRepositoryImpl : ContentRepository {
 
     private val db: FirebaseFirestore = Firebase.firestore
 
-    override fun getAllTopics(): Flow<ContentResult<List<Topic>>> = callbackFlow {
-        // Emit Loading state immediately
+    // Renamed function implementation
+    override fun getAllCategories(): Flow<ContentResult<List<Category>>> = callbackFlow {
         trySend(ContentResult.Loading).isSuccess
 
-        val topicsCollectionRef = db.collection("topics")
-            .orderBy("order", Query.Direction.ASCENDING) // Order by the 'order' field
+        val categoriesCollectionRef = db.collection("categories") // Fetch from "categories"
+            .orderBy("order", Query.Direction.ASCENDING)
 
-        val listenerRegistration = topicsCollectionRef.addSnapshotListener { snapshot, error ->
+        val listenerRegistration = categoriesCollectionRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                Log.w("ContentRepositoryImpl", "Listen failed for topics.", error)
-                trySend(ContentResult.Error(error)).isSuccess // Emit error
-                // Optionally close(error) if it's fatal
+                Log.w("ContentRepositoryImpl", "Listen failed for categories.", error)
+                trySend(ContentResult.Error(error)).isSuccess
                 return@addSnapshotListener
             }
 
             if (snapshot != null) {
-                // Use toObjects() to deserialize the whole collection into a list
-                val topics = snapshot.toObjects<Topic>()
-                Log.d("ContentRepositoryImpl", "Topics fetched: ${topics.size} items")
-                trySend(ContentResult.Success(topics)).isSuccess // Emit success with the list
+                // Deserialize into List<Category>
+                val categories = snapshot.toObjects<Category>()
+                Log.d("ContentRepositoryImpl", "Categories fetched: ${categories.size} items")
+                trySend(ContentResult.Success(categories)).isSuccess
             } else {
-                // Snapshot is null, which is unusual for collection listeners unless error occurred
-                Log.w("ContentRepositoryImpl", "Topics snapshot was null, emitting empty list.")
-                // Handle this case - maybe emit empty list or error? Let's emit Success with empty list.
-                trySend(ContentResult.Success(emptyList())).isSuccess
+                Log.w("ContentRepositoryImpl", "Categories snapshot was null.")
+                trySend(ContentResult.Success(emptyList())).isSuccess // Emit empty list
             }
         }
-
-        // Remove listener when Flow is cancelled
         awaitClose {
-            Log.d("ContentRepositoryImpl", "Closing topics listener.")
+            Log.d("ContentRepositoryImpl", "Closing categories listener.")
             listenerRegistration.remove()
         }
     }
 
-    // Implement other methods (getLessonsForTopic etc.) later
+    // New function implementation
+    override fun getTopicsForCategory(categoryId: String): Flow<ContentResult<List<Topic>>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+
+        if (categoryId.isBlank()) {
+            Log.w("ContentRepositoryImpl", "categoryId is blank, cannot fetch topics.")
+            // Emit error or empty list? Error seems appropriate.
+            trySend(ContentResult.Error(IllegalArgumentException("Category ID cannot be blank"))).isSuccess
+            close() // Close the flow
+            return@callbackFlow
+        }
+
+        val topicsCollectionRef = db.collection("topics")
+            .whereEqualTo("categoryId", categoryId) // Filter by categoryId
+            .orderBy("order", Query.Direction.ASCENDING) // Order within category
+
+        val listenerRegistration = topicsCollectionRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w("ContentRepositoryImpl", "Listen failed for topics in category $categoryId.", error)
+                trySend(ContentResult.Error(error)).isSuccess
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null) {
+                val topics = snapshot.toObjects<Topic>()
+                Log.d("ContentRepositoryImpl", "Topics for category $categoryId fetched: ${topics.size} items")
+                trySend(ContentResult.Success(topics)).isSuccess
+            } else {
+                Log.w("ContentRepositoryImpl", "Topics snapshot for category $categoryId was null.")
+                trySend(ContentResult.Success(emptyList())).isSuccess
+            }
+        }
+
+        awaitClose {
+            Log.d("ContentRepositoryImpl", "Closing topics listener for category $categoryId.")
+            listenerRegistration.remove()
+        }
+    }
+
+    // ... (Other future methods) ...
 }

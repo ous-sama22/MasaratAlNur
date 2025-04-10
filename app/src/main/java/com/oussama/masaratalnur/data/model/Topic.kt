@@ -5,7 +5,7 @@ import com.google.firebase.firestore.DocumentId // Import to potentially capture
 data class Topic(
     @DocumentId // Annotation to automatically populate this field with the document ID
     val id: String = "", // Unique ID for the topic (can be Firestore auto-ID)
-
+    val categoryId: String = "",
     val title_ar: String = "", // Title in Arabic
     val description_ar: String = "", // Description in Arabic
     val order: Int = 0, // For sorting/display order

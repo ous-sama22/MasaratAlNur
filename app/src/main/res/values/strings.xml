@@ -61,5 +61,6 @@
     <!-- Home -->
     <string name="home_empty_message">لا توجد مواضيع متاحة حاليًا.</string> <!-- No topics available currently. -->
     <string name="button_retry">إعادة المحاولة</string> <!-- Retry -->
+    <string name="categories_empty_message">لا توجد فئات متاحة حاليًا.</string> <!-- No categories available currently. -->
 
 </resources>

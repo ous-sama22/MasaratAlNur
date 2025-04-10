@@ -10,16 +10,21 @@ import androidx.core.view.isVisible // Import for easy visibility toggling
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels // Import ktx delegate
 import androidx.navigation.fragment.findNavController // Import for navigation later
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager // Import LayoutManager
 import com.oussama.masaratalnur.R
+import com.oussama.masaratalnur.data.model.Category
+import com.oussama.masaratalnur.data.model.CategoryListUiState
 import com.oussama.masaratalnur.data.model.Topic
 import com.oussama.masaratalnur.databinding.FragmentHomeBinding
 import com.oussama.masaratalnur.ui.adapter.TopicAdapter // Import adapter
 import com.oussama.masaratalnur.data.model.HomeUiState // Import UI State
+import com.oussama.masaratalnur.ui.adapter.CategoryAdapter
 import com.oussama.masaratalnur.ui.viewmodel.HomeViewModel // Import ViewModel
+import com.oussama.masaratalnur.util.CategoryClickListener
 import com.oussama.masaratalnur.util.TopicClickListener
 
-class HomeFragment : Fragment(), TopicClickListener { // Implement the click listener interface
+class HomeFragment : Fragment(), CategoryClickListener  { // Implement the click listener interface
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -28,7 +33,7 @@ class HomeFragment : Fragment(), TopicClickListener { // Implement the click lis
     private val homeViewModel: HomeViewModel by viewModels()
 
     // Declare adapter instance
-    private lateinit var topicAdapter: TopicAdapter
+    private lateinit var categoryAdapter: CategoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,57 +48,73 @@ class HomeFragment : Fragment(), TopicClickListener { // Implement the click lis
 
         setupRecyclerView()
         observeViewModel()
+        setupRetryButton()
     }
 
     private fun setupRecyclerView() {
         // Initialize the adapter, passing 'this' as the click listener
-        topicAdapter = TopicAdapter(this)
+        categoryAdapter = CategoryAdapter(this)
 
-        binding.recyclerViewTopics.apply { // Assuming RecyclerView ID in fragment_home.xml is recyclerViewTopics
-            layoutManager = LinearLayoutManager(context) // Use a linear layout
-            adapter = topicAdapter
-            // Optional: Add item decoration for spacing later
-            // addItemDecoration(...)
+        binding.recyclerViewCategories.apply { // Use correct ID
+            // Use GridLayoutManager, get spanCount from resources if desired or keep hardcoded
+            val spanCount = resources.getInteger(R.integer.category_grid_span_count)
+            layoutManager = GridLayoutManager(context, spanCount)
+            adapter = categoryAdapter
         }
+
     }
 
     private fun observeViewModel() {
-        homeViewModel.homeState.observe(viewLifecycleOwner) { state ->
-            // Handle different UI states
-            binding.progressBarHome.isVisible = state is HomeUiState.Loading // Show progress bar when loading
-            binding.recyclerViewTopics.isVisible = state is HomeUiState.Success // Show recycler view on success
-            binding.textEmptyState.isVisible = state is HomeUiState.Empty // Show empty message if list is empty
-            binding.textErrorState.isVisible = state is HomeUiState.Error // Show error message on error
+        homeViewModel.categoryListState.observe(viewLifecycleOwner) { state -> // Observe renamed state
+            binding.progressBarCategories.isVisible = state is CategoryListUiState.Loading
+            binding.recyclerViewCategories.isVisible = state is CategoryListUiState.Success
+            binding.textEmptyCategories.isVisible = state is CategoryListUiState.Empty
+            binding.textErrorCategories.isVisible = state is CategoryListUiState.Error
+            binding.buttonRetryCategories.isVisible = state is CategoryListUiState.Error // Show retry on error
 
             when (state) {
-                is HomeUiState.Success -> {
-                    Log.d("HomeFragment", "Received ${state.topics.size} topics")
-                    // Submit the list to the ListAdapter
-                    topicAdapter.submitList(state.topics)
+                is CategoryListUiState.Success -> {
+                    Log.d("HomeFragment", "Received ${state.categories.size} categories")
+                    categoryAdapter.submitList(state.categories) // Submit categories list
                 }
-                is HomeUiState.Error -> {
-                    Log.e("HomeFragment", "Error loading topics: ${state.message}")
-                    binding.textErrorState.text = state.message // Display specific error
-                    // Optionally add a retry button
+                is CategoryListUiState.Error -> {
+                    Log.e("HomeFragment", "Error loading categories: ${state.message}")
+                    binding.textErrorCategories.text = state.message
                 }
-                is HomeUiState.Empty -> {
-                    Log.d("HomeFragment", "Received empty topic list")
-                    binding.textEmptyState.text = getString(R.string.home_empty_message) // Define string
+                is CategoryListUiState.Empty -> {
+                    Log.d("HomeFragment", "Received empty category list")
+                    binding.textEmptyCategories.text = getString(R.string.categories_empty_message)
                 }
-                is HomeUiState.Loading -> {
-                    Log.d("HomeFragment", "Loading topics...")
+                is CategoryListUiState.Loading -> {
+                    Log.d("HomeFragment", "Loading categories...")
                 }
             }
         }
     }
 
-    // --- TopicClickListener Implementation ---
-    override fun onTopicClicked(topic: Topic) {
-        Toast.makeText(context, "Clicked on: ${topic.title_ar}", Toast.LENGTH_SHORT).show()
-        Log.d("HomeFragment", "Topic clicked: ID=${topic.id}, Title=${topic.title_ar}")
-        // TODO: Navigate to LessonListFragment, passing topic.id
-        // val action = HomeFragmentDirections.actionHomeFragmentToLessonListFragment(topic.id)
-        // findNavController().navigate(action)
+    // Add retry button logic
+    private fun setupRetryButton() {
+        binding.buttonRetryCategories.setOnClickListener {
+            Log.d("HomeFragment", "Retry button clicked")
+            // How to trigger reload? One way: Re-observe. Another: Add function to ViewModel.
+            // Simple way for now: just re-observe which might trigger repo fetch again.
+            // Or add a refresh function to ViewModel: homeViewModel.loadCategories()
+            // Let's add a simple refresh function to ViewModel (requires modifying ViewModel)
+            homeViewModel.refreshCategories() // We need to add this to HomeViewModel
+        }
+    }
+
+    // --- CategoryClickListener Implementation ---
+    override fun onCategoryClicked(category: Category) { // Method renamed
+        Toast.makeText(context, "Clicked on: ${category.title_ar}", Toast.LENGTH_SHORT).show()
+        Log.d("HomeFragment", "Category clicked: ID=${category.id}, Title=${category.title_ar}")
+
+        // Navigate using Safe Args (Requires setup)
+        // 1. Define argument in main_nav_graph.xml for TopicListFragment
+        // 2. Define action in HomeFragment within main_nav_graph.xml
+        // 3. Rebuild project to generate NavDirections class
+        val action = HomeFragmentDirections.actionHomeFragmentToTopicListFragment(categoryId = category.id)
+        findNavController().navigate(action)
     }
 
 
