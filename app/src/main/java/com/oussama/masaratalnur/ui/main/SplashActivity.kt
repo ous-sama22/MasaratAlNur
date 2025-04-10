@@ -28,15 +28,17 @@ class SplashActivity : AppCompatActivity() {
 
         // Use lifecycleScope to launch a coroutine that's tied to the Activity's lifecycle
         lifecycleScope.launch {
-            delay(1500) // Wait for 1.5 seconds (adjust as needed)
 
-            // Check authentication status AFTER the delay
+            // Check authentication status
             if (auth.currentUser == null) {
+                delay(1500) // Wait for 1.5 seconds (adjust as needed)
 
                 Log.d("SplashActivity", "User not logged in. Navigating to AuthActivity (Placeholder: MainActivity).")
                 startActivity(Intent(this@SplashActivity, AuthActivity::class.java))
 
             } else {
+                delay(500) // Wait for 0.5 seconds (adjust as needed)
+
                 // Logged in - Go to MainActivity
                 Log.d("SplashActivity", "User logged in. Navigating to MainActivity.")
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
