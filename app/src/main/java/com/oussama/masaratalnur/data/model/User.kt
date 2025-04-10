@@ -11,8 +11,4 @@ data class User(
     var totalXP: Int = 0,
     var currentStreak: Int = 0
     // Add other fields like lastActivityDate (Timestamp or String), completedLessonIds (List<String>) later
-) {
-    // Add a no-argument constructor for Firestore deserialization if needed,
-    // though Kotlin data classes often work directly if properties have defaults.
-    //constructor() : this("", "", null, 0, 0)
-}
+)

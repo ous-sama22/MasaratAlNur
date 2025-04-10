@@ -57,4 +57,9 @@
     <string name="unknown_user">مستخدم غير معروف</string> <!-- Unknown User -->
     <string name="email_not_available">البريد الإلكتروني غير متوفر</string> <!-- Email not available -->
 
+
+    <!-- Home -->
+    <string name="home_empty_message">لا توجد مواضيع متاحة حاليًا.</string> <!-- No topics available currently. -->
+    <string name="button_retry">إعادة المحاولة</string> <!-- Retry -->
+
 </resources>
