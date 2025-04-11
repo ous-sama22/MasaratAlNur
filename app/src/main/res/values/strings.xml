@@ -61,6 +61,35 @@
     <!-- Home -->
     <string name="home_empty_message">لا توجد مواضيع متاحة حاليًا.</string> <!-- No topics available currently. -->
     <string name="button_retry">إعادة المحاولة</string> <!-- Retry -->
-    <string name="categories_empty_message">لا توجد فئات متاحة حاليًا.</string> <!-- No categories available currently. -->
+    <string name="categories_empty_message">لا توجد فئات متاحة حاليًا.</string>
+    <string name="button_admin_dashboard">لوحة تحكم المسؤول</string> <!-- No categories available currently. -->
+
+
+    <!-- Admin -->
+    <string name="admin_manage_categories">إدارة الفئات</string>
+    <string name="admin_manage_topics">إدارة المواضيع</string>
+    <string name="admin_manage_lessons">إدارة الدروس</string>
+    <string name="admin_manage_quizzes">إدارة الاختبارات</string>
+    <string name="admin_dashboard_title">لوحة التحكم</string>
+    <string name="admin_categories_title">إدارة الفئات</string>
+    <string name="admin_add_category">إضافة فئة</string>
+    <string name="admin_edit_category">تعديل الفئة</string>
+    <string name="hint_category_title_ar">عنوان الفئة (عربي)</string>
+    <string name="hint_category_desc_ar">وصف الفئة (عربي)</string>
+    <string name="hint_order">الترتيب</string>
+    <string name="hint_image_url">رابط الصورة (اختياري)</string>
+    <string name="button_save">حفظ</string>
+    <string name="button_delete">حذف</string>
+    <string name="confirm_delete_title">تأكيد الحذف</string>
+    <string name="confirm_delete_message">هل أنت متأكد أنك تريد حذف هذا العنصر؟</string>
+    <string name="button_confirm">تأكيد</string>
+    <string name="button_cancel">إلغاء</string>
+    <string name="error_saving_item">خطأ أثناء حفظ العنصر: %s</string>
+    <string name="error_deleting_item">خطأ أثناء حذف العنصر: %s</string>
+    <string name="item_saved_success">تم حفظ العنصر بنجاح.</string>
+    <string name="item_deleted_success">تم حذف العنصر بنجاح.</string>
+    <string name="validation_title_required">العنوان مطلوب.</string>
+    <string name="validation_description_required">الوصف مطلوب.</string>
+    <string name="validation_order_invalid">الترتيب يجب أن يكون رقمًا.</string>
 
 </resources>

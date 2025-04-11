@@ -2,11 +2,11 @@ package com.oussama.masaratalnur.data.repository
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration // Import if not already
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 // Import toObjects for Category as well
 import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.oussama.masaratalnur.data.model.Category // Import Category
 import com.oussama.masaratalnur.data.model.ContentResult
@@ -14,6 +14,7 @@ import com.oussama.masaratalnur.data.model.Topic
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 class ContentRepositoryImpl : ContentRepository {
 
@@ -45,6 +46,81 @@ class ContentRepositoryImpl : ContentRepository {
         }
         awaitClose {
             Log.d("ContentRepositoryImpl", "Closing categories listener.")
+            listenerRegistration.remove()
+        }
+    }
+
+    override suspend fun addCategory(category: Category): Result<Unit> {
+        return try {
+            // Create new doc with auto-ID, set data EXCEPT the ID field itself
+            db.collection("categories").add(category.copy(id = "")).await() // Use add() for auto-ID
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error adding category", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateCategory(category: Category): Result<Unit> {
+        return try {
+            if (category.id.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for update"))
+            // Use set with merge=true or update? Set is simpler if sending whole object.
+            db.collection("categories").document(category.id).set(category).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error updating category ${category.id}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteCategory(categoryId: String): Result<Unit> {
+        return try {
+            if (categoryId.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for delete"))
+            db.collection("categories").document(categoryId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error deleting category $categoryId", e)
+            Result.failure(e)
+        }
+    }
+
+    override fun getCategory(categoryId: String): Flow<ContentResult<Category>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+
+        if (categoryId.isBlank()) {
+            trySend(ContentResult.Error(IllegalArgumentException("Category ID cannot be blank"))).isSuccess
+            close()
+            return@callbackFlow
+        }
+
+        val docRef = db.collection("categories").document(categoryId)
+
+        val listenerRegistration = docRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w("ContentRepositoryImpl", "Listen failed for category $categoryId.", error)
+                trySend(ContentResult.Error(error)).isSuccess
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                val category: Category? = try { snapshot.toObject<Category>() } catch (e: Exception) { null }
+                if (category != null) {
+                    Log.d("ContentRepositoryImpl", "Category $categoryId fetched: $category")
+                    trySend(ContentResult.Success(category)).isSuccess
+                } else {
+                    // Deserialization failed somehow, treat as error or not found
+                    Log.e("ContentRepositoryImpl", "Failed to deserialize category $categoryId.")
+                    trySend(ContentResult.Error(Exception("Failed to parse category data."))).isSuccess
+                }
+            } else {
+                // Document doesn't exist
+                Log.w("ContentRepositoryImpl", "Category $categoryId does not exist.")
+                trySend(ContentResult.Error(NoSuchElementException("Category not found."))).isSuccess
+            }
+        }
+
+        awaitClose {
+            Log.d("ContentRepositoryImpl", "Closing category listener for $categoryId.")
             listenerRegistration.remove()
         }
     }

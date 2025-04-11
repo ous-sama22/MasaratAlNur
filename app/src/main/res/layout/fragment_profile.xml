@@ -109,6 +109,19 @@
         tools:text="🔥 5 Days" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_admin_dashboard"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/button_admin_dashboard"
+            app:layout_constraintBottom_toTopOf="@id/button_logout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

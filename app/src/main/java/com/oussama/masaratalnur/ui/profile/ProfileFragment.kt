@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels // Use ktx delegate
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -13,7 +14,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.oussama.masaratalnur.ui.auth.AuthActivity
 import com.oussama.masaratalnur.R
 import com.oussama.masaratalnur.data.model.AuthUiState
+import com.oussama.masaratalnur.data.model.User
 import com.oussama.masaratalnur.databinding.FragmentProfileBinding
+import com.oussama.masaratalnur.ui.admin.AdminActivity
 // Import the ViewModels using the new package structure
 import com.oussama.masaratalnur.ui.viewmodel.AuthViewModel
 import com.oussama.masaratalnur.ui.viewmodel.UserViewModel
@@ -40,6 +43,7 @@ class ProfileFragment : Fragment() {
 
         setupLogoutButton() // Keep logout separate
         observeViewModel() // Set up observers
+        setupAdminButtonListener()
     }
 
     private fun setupLogoutButton() {
@@ -70,6 +74,8 @@ class ProfileFragment : Fragment() {
 
         // --- Observe User Data (from UserViewModel) ---
         userViewModel.user.observe(viewLifecycleOwner) { user ->
+            binding.buttonAdminDashboard.isVisible = false // Default to hidden
+
             if (user != null) {
                 Log.d("ProfileFragment", "Observed user data: ${user.email}, XP: ${user.totalXP}, Streak: ${user.currentStreak}")
                 binding.textUserEmail.text = user.email ?: getString(R.string.email_not_available) // Add string if needed
@@ -83,6 +89,14 @@ class ProfileFragment : Fragment() {
                     binding.textStreakValue.text = getString(R.string.streak_format_zero)
                 }
 
+                // Check user role and show admin button if applicable
+                if (user.role == User.ROLE_EDITOR) {
+                    Log.d("ProfileFragment", "User is admin, showing admin button.")
+                    binding.buttonAdminDashboard.isVisible = true
+                } else {
+                    Log.d("ProfileFragment", "User role is ${user.role}, hiding admin button.")
+                }
+
             } else {
                 Log.d("ProfileFragment", "Observed null user data.")
                 binding.textUserEmail.text = getString(R.string.user_not_found)
@@ -92,6 +106,15 @@ class ProfileFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun setupAdminButtonListener() {
+        binding.buttonAdminDashboard.setOnClickListener {
+            Log.d("ProfileFragment", "Admin Dashboard button clicked.")
+            // TODO: Navigate to AdminActivity or AdminDashboardFragment
+            val intent = Intent(requireActivity(), AdminActivity::class.java) // Create AdminActivity next
+            startActivity(intent)
+        }
     }
 
     private fun navigateToAuthActivity() {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.admin.dashboard.AdminDashboardFragment">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_manage_categories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_manage_categories"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_manage_topics"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_manage_topics"
+            app:layout_constraintTop_toBottomOf="@id/button_manage_categories"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_manage_lessons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_manage_lessons"
+            app:layout_constraintTop_toBottomOf="@id/button_manage_topics"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_manage_quizzes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_manage_quizzes"
+            app:layout_constraintTop_toBottomOf="@id/button_manage_lessons"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

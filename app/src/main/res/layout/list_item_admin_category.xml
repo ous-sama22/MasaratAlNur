@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/text_admin_category_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_edit_category"
+        app:layout_constraintBottom_toTopOf="@id/text_admin_category_desc"
+        tools:text="Category Title"
+        android:layout_marginEnd="8dp"/>
+
+    <TextView
+        android:id="@+id/text_admin_category_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        android:textColor="?android:attr/textColorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/text_admin_category_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/text_admin_category_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="Category description short"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+
+    <ImageButton
+        android:id="@+id/button_delete_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?android:attr/textColorSecondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/button_delete"/>
+
+    <ImageButton
+        android:id="@+id/button_edit_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?android:attr/textColorSecondary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_delete_category"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/admin_edit_category"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

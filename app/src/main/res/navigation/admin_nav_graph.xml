@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin_nav_graph"
+    app:startDestination="@id/adminDashboardFragment">
+
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.oussama.masaratalnur.ui.admin.dashboard.AdminDashboardFragment"
+        android:label="@string/admin_dashboard_title"
+        tools:layout="@layout/fragment_admin_dashboard">
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_adminCategoryListFragment"
+            app:destination="@id/adminCategoryListFragment" />
+        <!-- Add actions for topics, lessons, quizzes -->
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminCategoryListFragment"
+        android:name="com.oussama.masaratalnur.ui.admin.category.ui.AdminCategoryListFragment"
+        android:label="@string/admin_categories_title"
+        tools:layout="@layout/fragment_admin_category_list">
+        <action
+            android:id="@+id/action_adminCategoryListFragment_to_adminAddEditCategoryFragment"
+            app:destination="@id/adminAddEditCategoryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminAddEditCategoryFragment"
+        android:name="com.oussama.masaratalnur.ui.admin.category.ui.AdminAddEditCategoryFragment"
+        android:label=""
+        tools:layout="@layout/fragment_admin_add_edit_category">
+        <argument
+            android:name="categoryId"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <!-- TODO: Add Fragments and Actions for Topics, Lessons, Quizzes -->
+
+</navigation>
