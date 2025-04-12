@@ -10,6 +10,8 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.oussama.masaratalnur.data.model.Category // Import Category
 import com.oussama.masaratalnur.data.model.ContentResult
+import com.oussama.masaratalnur.data.model.ContentStatus
+import com.oussama.masaratalnur.data.model.Lesson
 import com.oussama.masaratalnur.data.model.Topic
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -20,14 +22,17 @@ class ContentRepositoryImpl : ContentRepository {
 
     private val db: FirebaseFirestore = Firebase.firestore
 
-    // Renamed function implementation
+    private val categoriesCollection = db.collection("categories")
+    private val topicsCollection = db.collection("topics")
+    private val lessonsCollection = db.collection("lessons")
+
+    // --- Categories Impl ---
     override fun getAllCategories(): Flow<ContentResult<List<Category>>> = callbackFlow {
         trySend(ContentResult.Loading).isSuccess
 
-        val categoriesCollectionRef = db.collection("categories") // Fetch from "categories"
-            .orderBy("order", Query.Direction.ASCENDING)
+        categoriesCollection.orderBy("order", Query.Direction.ASCENDING)
 
-        val listenerRegistration = categoriesCollectionRef.addSnapshotListener { snapshot, error ->
+        val listenerRegistration = categoriesCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.w("ContentRepositoryImpl", "Listen failed for categories.", error)
                 trySend(ContentResult.Error(error)).isSuccess
@@ -50,40 +55,6 @@ class ContentRepositoryImpl : ContentRepository {
         }
     }
 
-    override suspend fun addCategory(category: Category): Result<Unit> {
-        return try {
-            // Create new doc with auto-ID, set data EXCEPT the ID field itself
-            db.collection("categories").add(category.copy(id = "")).await() // Use add() for auto-ID
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Log.e("ContentRepositoryImpl", "Error adding category", e)
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun updateCategory(category: Category): Result<Unit> {
-        return try {
-            if (category.id.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for update"))
-            // Use set with merge=true or update? Set is simpler if sending whole object.
-            db.collection("categories").document(category.id).set(category).await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Log.e("ContentRepositoryImpl", "Error updating category ${category.id}", e)
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun deleteCategory(categoryId: String): Result<Unit> {
-        return try {
-            if (categoryId.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for delete"))
-            db.collection("categories").document(categoryId).delete().await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Log.e("ContentRepositoryImpl", "Error deleting category $categoryId", e)
-            Result.failure(e)
-        }
-    }
-
     override fun getCategory(categoryId: String): Flow<ContentResult<Category>> = callbackFlow {
         trySend(ContentResult.Loading).isSuccess
 
@@ -93,7 +64,7 @@ class ContentRepositoryImpl : ContentRepository {
             return@callbackFlow
         }
 
-        val docRef = db.collection("categories").document(categoryId)
+        val docRef = categoriesCollection.document(categoryId)
 
         val listenerRegistration = docRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -125,7 +96,42 @@ class ContentRepositoryImpl : ContentRepository {
         }
     }
 
-    // New function implementation
+    override suspend fun addCategory(category: Category): Result<Unit> {
+        return try {
+            // Create new doc with auto-ID, set data EXCEPT the ID field itself
+            categoriesCollection.add(category.copy(id = "")).await() // Use add() for auto-ID
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error adding category", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateCategory(category: Category): Result<Unit> {
+        return try {
+            if (category.id.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for update"))
+            // Use set with merge=true or update? Set is simpler if sending whole object.
+            categoriesCollection.document(category.id).set(category).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error updating category ${category.id}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteCategory(categoryId: String): Result<Unit> {
+        return try {
+            if (categoryId.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for delete"))
+            categoriesCollection.document(categoryId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error deleting category $categoryId", e)
+            Result.failure(e)
+        }
+    }
+
+
+    // --- Topics Impl ---
     override fun getTopicsForCategory(categoryId: String): Flow<ContentResult<List<Topic>>> = callbackFlow {
         trySend(ContentResult.Loading).isSuccess
 
@@ -137,17 +143,15 @@ class ContentRepositoryImpl : ContentRepository {
             return@callbackFlow
         }
 
-        val topicsCollectionRef = db.collection("topics")
-            .whereEqualTo("categoryId", categoryId) // Filter by categoryId
+        var query = topicsCollection.whereEqualTo("categoryId", categoryId) // Filter by categoryId
             .orderBy("order", Query.Direction.ASCENDING) // Order within category
 
-        val listenerRegistration = topicsCollectionRef.addSnapshotListener { snapshot, error ->
+        val listenerRegistration = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.w("ContentRepositoryImpl", "Listen failed for topics in category $categoryId.", error)
                 trySend(ContentResult.Error(error)).isSuccess
                 return@addSnapshotListener
             }
-
             if (snapshot != null) {
                 val topics = snapshot.toObjects<Topic>()
                 Log.d("ContentRepositoryImpl", "Topics for category $categoryId fetched: ${topics.size} items")
@@ -179,7 +183,6 @@ class ContentRepositoryImpl : ContentRepository {
         }
         awaitClose { listener.remove() }
     }
-
 
     override fun getTopic(topicId: String): Flow<ContentResult<Topic>> = callbackFlow {
         trySend(ContentResult.Loading).isSuccess
@@ -239,5 +242,115 @@ class ContentRepositoryImpl : ContentRepository {
         }
     }
 
-    // ... (Other future methods) ...
+
+    // --- Lessons Impl ---
+    override fun getLessonsForTopic(topicId: String): Flow<ContentResult<List<Lesson>>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+        if (topicId.isBlank()) {
+            trySend(ContentResult.Error(IllegalArgumentException("Topic ID cannot be blank"))).isSuccess
+            close(); return@callbackFlow
+        }
+        // Query for PUBLISHED lessons only for regular users
+        // TODO: Modify later based on user role if drafts need to be shown to editors
+        val query = lessonsCollection
+            .whereEqualTo("topicId", topicId)
+            .whereEqualTo("status", ContentStatus.PUBLISHED.name) // Query by enum name string
+            .orderBy("order", Query.Direction.ASCENDING)
+
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w("ContentRepositoryImpl", "Listen failed for Lesson in topicId $topicId.", error)
+                trySend(ContentResult.Error(error)).isSuccess
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val lessons = snapshot.toObjects<Lesson>()
+                Log.d("ContentRepositoryImpl", "Lessons for topic $topicId fetched: ${lessons.size} items")
+                trySend(ContentResult.Success(lessons)).isSuccess
+            } else {
+                Log.w("ContentRepositoryImpl", "Lessons snapshot for topic $topicId was null.")
+                trySend(ContentResult.Success(emptyList())).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override fun getAllLessons(): Flow<ContentResult<List<Lesson>>> = callbackFlow {
+        // WARNING: Fetching ALL lessons might be inefficient. Use with caution or pagination.
+        // Typically for Admin use. Does not filter by status here, assumes admin context.
+        trySend(ContentResult.Loading).isSuccess
+        val query = lessonsCollection.orderBy("topicId").orderBy("order", Query.Direction.ASCENDING)
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(ContentResult.Error(error)).isSuccess; return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                trySend(ContentResult.Success(snapshot.toObjects<Lesson>())).isSuccess
+            } else {
+                trySend(ContentResult.Success(emptyList())).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override fun getLesson(lessonId: String): Flow<ContentResult<Lesson>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+        if (lessonId.isBlank()) {
+            trySend(ContentResult.Error(IllegalArgumentException("Lesson ID cannot be blank"))).isSuccess
+            close(); return@callbackFlow
+        }
+        val docRef = lessonsCollection.document(lessonId)
+        val listener = docRef.addSnapshotListener { snapshot, error ->
+            // ... handle snapshot/error, similar to getTopic/getCategory ...
+            if (error != null) {
+                trySend(ContentResult.Error(error)).isSuccess; return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                val lesson = try { snapshot.toObject<Lesson>() } catch (e: Exception) { null }
+                if (lesson != null) trySend(ContentResult.Success(lesson)).isSuccess
+                else trySend(ContentResult.Error(Exception("Failed to parse lesson data"))).isSuccess
+            } else {
+                trySend(ContentResult.Error(NoSuchElementException("Lesson not found"))).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun addLesson(lesson: Lesson): Result<Unit> {
+        return try {
+            if (lesson.topicId.isBlank()) return Result.failure(IllegalArgumentException("Topic ID required for lesson"))
+            // Add will serialize the lesson, including its status enum as a string
+            lessonsCollection.add(lesson.copy(id = "")).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error adding lesson", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateLesson(lesson: Lesson): Result<Unit> {
+        return try {
+            if (lesson.id.isBlank()) return Result.failure(IllegalArgumentException("Lesson ID required for update"))
+            if (lesson.topicId.isBlank()) return Result.failure(IllegalArgumentException("Topic ID required for lesson"))
+            // Set will serialize the lesson, including its status enum as a string
+            lessonsCollection.document(lesson.id).set(lesson).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error updating lesson ${lesson.id}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteLesson(lessonId: String): Result<Unit> {
+        return try {
+            if (lessonId.isBlank()) return Result.failure(IllegalArgumentException("Lesson ID required for delete"))
+            lessonsCollection.document(lessonId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error deleting lesson $lessonId", e)
+            Result.failure(e)
+        }
+    }
+
+    // ... Quizzes Impl ...
 }

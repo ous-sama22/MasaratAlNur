@@ -9,6 +9,7 @@ data class Topic(
     val title_ar: String = "", // Title in Arabic
     val description_ar: String = "", // Description in Arabic
     val order: Int = 0, // For sorting/display order
-    val imageUrl: String? = null // Optional URL for a topic image
+    val imageUrl: String? = null, // Optional URL for a topic image
+    val status: ContentStatus = ContentStatus.PUBLISHED
     // Add any other relevant fields, e.g., estimated time, difficulty level
 )

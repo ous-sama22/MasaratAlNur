@@ -96,10 +96,6 @@ class HomeFragment : Fragment(), CategoryClickListener  { // Implement the click
     private fun setupRetryButton() {
         binding.buttonRetryCategories.setOnClickListener {
             Log.d("HomeFragment", "Retry button clicked")
-            // How to trigger reload? One way: Re-observe. Another: Add function to ViewModel.
-            // Simple way for now: just re-observe which might trigger repo fetch again.
-            // Or add a refresh function to ViewModel: homeViewModel.loadCategories()
-            // Let's add a simple refresh function to ViewModel (requires modifying ViewModel)
             homeViewModel.refreshCategories() // We need to add this to HomeViewModel
         }
     }
@@ -109,10 +105,6 @@ class HomeFragment : Fragment(), CategoryClickListener  { // Implement the click
         Toast.makeText(context, "Clicked on: ${category.title_ar}", Toast.LENGTH_SHORT).show()
         Log.d("HomeFragment", "Category clicked: ID=${category.id}, Title=${category.title_ar}")
 
-        // Navigate using Safe Args (Requires setup)
-        // 1. Define argument in main_nav_graph.xml for TopicListFragment
-        // 2. Define action in HomeFragment within main_nav_graph.xml
-        // 3. Rebuild project to generate NavDirections class
         val action = HomeFragmentDirections.actionHomeFragmentToTopicListFragment(categoryId = category.id)
         findNavController().navigate(action)
     }

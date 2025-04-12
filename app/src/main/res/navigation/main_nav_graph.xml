@@ -32,11 +32,26 @@
         android:name="com.oussama.masaratalnur.ui.topic.TopicListFragment"
         android:label="Topics"
         tools:layout="@layout/fragment_topic_list">
-        <!-- Define argument for categoryId -->
         <argument
             android:name="categoryId"
             app:argType="string" />
-        <!-- No default value, must be passed -->
+        <action
+            android:id="@+id/action_topicListFragment_to_lessonListFragment"
+            app:destination="@id/lessonListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lessonListFragment"
+        android:name="com.oussama.masaratalnur.ui.lesson.LessonListFragment"
+        android:label="fragment_lesson_list"
+        tools:layout="@layout/fragment_lesson_list">
+        <argument
+            android:name="topicId"
+            app:argType="string" />
     </fragment>
 
 </navigation>

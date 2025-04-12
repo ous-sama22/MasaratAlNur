@@ -8,5 +8,7 @@ data class Category(
     val title_ar: String = "",
     val description_ar: String = "",
     val order: Int = 0,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val status: ContentStatus = ContentStatus.PUBLISHED
+
 )

@@ -2,6 +2,7 @@ package com.oussama.masaratalnur.data.repository
 
 import com.oussama.masaratalnur.data.model.Category
 import com.oussama.masaratalnur.data.model.ContentResult
+import com.oussama.masaratalnur.data.model.Lesson
 import com.oussama.masaratalnur.data.model.Topic
 // Import Lesson, Quiz later when needed
 import kotlinx.coroutines.flow.Flow
@@ -23,16 +24,11 @@ interface ContentRepository {
     suspend fun updateTopic(topic: Topic): Result<Unit>
     suspend fun deleteTopic(topicId: String): Result<Unit>
 
-    // --- Lessons (Placeholders for future comprehensive implementation) ---
-    // fun getLessonsForTopic(topicId: String): Flow<ContentResult<List<Lesson>>>
-    // fun getAllLessons(): Flow<ContentResult<List<Lesson>>>
-    // fun getLesson(lessonId: String): Flow<ContentResult<Lesson>>
-    // suspend fun addLesson(lesson: Lesson): Result<Unit>
-    // suspend fun updateLesson(lesson: Lesson): Result<Unit>
-    // suspend fun deleteLesson(lessonId: String): Result<Unit>
-
-    // Functions to get lessons for a topic, specific lesson, quizzes etc. will be added later
-    // fun getLessonsForTopic(topicId: String): Flow<ContentResult<List<Lesson>>>
-    // fun getLesson(lessonId: String): Flow<ContentResult<Lesson>>
-    // fun getQuiz(quizId: String): Flow<ContentResult<Quiz>>
+    // --- Lessons ---
+    fun getLessonsForTopic(topicId: String): Flow<ContentResult<List<Lesson>>> // Get lessons for a specific topic
+    fun getAllLessons(): Flow<ContentResult<List<Lesson>>> // Get ALL lessons (for admin?)
+    fun getLesson(lessonId: String): Flow<ContentResult<Lesson>> // Get a single lesson by its ID
+    suspend fun addLesson(lesson: Lesson): Result<Unit>
+    suspend fun updateLesson(lesson: Lesson): Result<Unit>
+    suspend fun deleteLesson(lessonId: String): Result<Unit>
 }

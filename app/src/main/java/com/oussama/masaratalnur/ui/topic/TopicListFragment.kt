@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels // Use delegate
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.oussama.masaratalnur.R
 import com.oussama.masaratalnur.data.model.Topic
@@ -31,7 +32,11 @@ class TopicListFragment : Fragment(), TopicClickListener { // Implement click li
 
     private lateinit var topicAdapter: TopicAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentTopicListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -87,9 +92,9 @@ class TopicListFragment : Fragment(), TopicClickListener { // Implement click li
     override fun onTopicClicked(topic: Topic) {
         Toast.makeText(context, "Clicked Topic: ${topic.title_ar}", Toast.LENGTH_SHORT).show()
         Log.d("TopicListFragment", "Topic clicked: ID=${topic.id}, Title=${topic.title_ar}")
-        // TODO: Navigate to LessonListFragment, passing topic.id
-        // val action = TopicListFragmentDirections.actionTopicListFragmentToLessonListFragment(topicId = topic.id)
-        // findNavController().navigate(action)
+
+         val action = TopicListFragmentDirections.actionTopicListFragmentToLessonListFragment(topicId = topic.id)
+         findNavController().navigate(action)
     }
 
     override fun onDestroyView() {
