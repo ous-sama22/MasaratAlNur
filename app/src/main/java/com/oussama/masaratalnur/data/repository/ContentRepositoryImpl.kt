@@ -164,5 +164,80 @@ class ContentRepositoryImpl : ContentRepository {
         }
     }
 
+    override fun getAllTopics(): Flow<ContentResult<List<Topic>>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+        val query = topicsCollection.orderBy("categoryId").orderBy("order", Query.Direction.ASCENDING) // Example ordering
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(ContentResult.Error(error)).isSuccess; return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                trySend(ContentResult.Success(snapshot.toObjects<Topic>())).isSuccess
+            } else {
+                trySend(ContentResult.Success(emptyList())).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+
+    override fun getTopic(topicId: String): Flow<ContentResult<Topic>> = callbackFlow {
+        trySend(ContentResult.Loading).isSuccess
+        if (topicId.isBlank()) {
+            trySend(ContentResult.Error(IllegalArgumentException("Topic ID cannot be blank"))).isSuccess
+            close(); return@callbackFlow
+        }
+        val docRef = topicsCollection.document(topicId)
+        val listener = docRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(ContentResult.Error(error)).isSuccess; return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                val topic = try { snapshot.toObject<Topic>() } catch (e: Exception) { null }
+                if (topic != null) trySend(ContentResult.Success(topic)).isSuccess
+                else trySend(ContentResult.Error(Exception("Failed to parse topic data"))).isSuccess
+            } else {
+                trySend(ContentResult.Error(NoSuchElementException("Topic not found"))).isSuccess
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun addTopic(topic: Topic): Result<Unit> {
+        return try {
+            // Ensure categoryId is set before adding
+            if (topic.categoryId.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for topic"))
+            // Add document with auto-generated ID
+            topicsCollection.add(topic.copy(id = "")).await() // Add with auto-ID
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error adding topic", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateTopic(topic: Topic): Result<Unit> {
+        return try {
+            if (topic.id.isBlank()) return Result.failure(IllegalArgumentException("Topic ID required for update"))
+            if (topic.categoryId.isBlank()) return Result.failure(IllegalArgumentException("Category ID required for topic"))
+            topicsCollection.document(topic.id).set(topic).await() // Use set to overwrite
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error updating topic ${topic.id}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteTopic(topicId: String): Result<Unit> {
+        return try {
+            if (topicId.isBlank()) return Result.failure(IllegalArgumentException("Topic ID required for delete"))
+            topicsCollection.document(topicId).delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ContentRepositoryImpl", "Error deleting topic $topicId", e)
+            Result.failure(e)
+        }
+    }
+
     // ... (Other future methods) ...
 }

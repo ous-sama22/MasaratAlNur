@@ -91,5 +91,6 @@
     <string name="validation_title_required">العنوان مطلوب.</string>
     <string name="validation_description_required">الوصف مطلوب.</string>
     <string name="validation_order_invalid">الترتيب يجب أن يكون رقمًا.</string>
+    <string name="topics_empty_message">لا توجد مواضيع في هذه الفئة بعد.</string>
 
 </resources>
